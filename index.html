@@ -1,0 +1,584 @@
+<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script type="text/javascript">
+    let userAddress = ""
+    let selectedForStaking = []
+    let selectedForUnstaking = []
+    let myNfts = []
+    let nftContractAddress = "0x630f9ff82F82A68671dF290fFAEC2D767Df77a07"
+    let stakingContractAddress = "0xaf2e1e2fB8AAB3cB951ADcBC3dc448Af52603f7A"
+    let tokenContractAddress = "0x2D163701bF3920fF1b1AD0e3B1d0e0d5747CF067"
+    let networkProvider = "https://eth-mainnet.alchemyapi.io/v2/Wq9Q8vRbE6Spk184NPdedK15LyhgRa4N"
+
+    window.onload = function () {
+
+        var mintButton = document.getElementById('mint-button')
+        if (mintButton) {
+            updateNftStats();
+
+            document.getElementById('mint-button').onclick = function () {
+                mint();
+            };
+        }
+        var connectButton = document.getElementById('connect-button')
+        if (connectButton) {
+            document.getElementById('connect-button').onclick = function () {
+                connectWallet();
+            };
+        }
+        var connectButtonStake = document.getElementById('connect-button-stake')
+        if (connectButtonStake) {
+            connectWalletStake()
+            document.getElementById('connect-button-stake').onclick = function () {
+                connectWalletStake()
+            };
+        }
+
+        var stakeButton = document.getElementById('stake-button')
+        if (stakeButton) {
+            document.getElementById('stake-button').onclick = function () {
+                stakeNFTs()
+            };
+        }
+        var unstakeAllButton = document.getElementById('unstake-all-button')
+        if (unstakeAllButton) {
+            document.getElementById('unstake-all-button').onclick = function () {
+                unstakeAll()
+            };
+
+            document.getElementById('approve-button').onclick = function () {
+                approve()
+            };
+
+            document.getElementById('unstake-selected-button').onclick = function () {
+                unstakeSelected()
+            };
+        }
+
+    }
+
+    async function getTokenBalance() {
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+        let address = userAddress
+
+        let tokenAbi = [
+            "function balanceOf(address account) public view returns (uint256)",
+        ];
+
+        let TokenContract = new ethers.Contract(
+            tokenContractAddress,
+            tokenAbi,
+            provider.getSigner()
+        );
+
+        let balance = await TokenContract.balanceOf(address)
+        let formattedBalance = parseFloat(ethers.utils.formatEther(balance)).toFixed(4)
+        document.getElementById('tokens-in-wallet').innerText = `${formattedBalance} HBC`
+    }
+
+    async function getBonusRewards() {
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+        let address = userAddress
+
+        let stakedAbi = [
+            "function bonusRewards(address _staker) public view returns (uint256[] memory)",
+        ];
+
+        let StakingContract = new ethers.Contract(
+            stakingContractAddress,
+            stakedAbi,
+            provider.getSigner()
+        );
+
+        let bonuses = (await StakingContract.bonusRewards(address)).map(Number)
+
+        let bonus = 0;
+        if (bonuses.length > 1) {
+
+            var total = 0;
+            for(var i = 0; i < bonuses.length; i++) {
+                total += bonuses[i];
+            }
+            var avg = total / bonuses.length;
+
+            bonus = avg.toFixed(2)
+        } else if (bonuses.length == 1) {
+            bonus = bonuses[0]
+        } else {
+            bonus = 0;
+        }
+        document.getElementById('token-multiplier').innerText = `${bonus}% / NFT`
+    }
+
+    async function getAvailableReward() {
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+        let address = userAddress
+
+        let stakedAbi = [
+            "function tokensAwarded(address _staker) public view returns (uint256)",
+        ];
+
+        let StakingContract = new ethers.Contract(
+            stakingContractAddress,
+            stakedAbi,
+            provider.getSigner()
+        );
+
+        let tokensAwarded = parseFloat(ethers.utils.formatEther(await StakingContract.tokensAwarded(address))).toFixed(4)
+        document.getElementById('total-earned').innerText = `${tokensAwarded} HBC`
+    }
+    async function hideApprove() {
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+        let address = userAddress
+
+        let nftAbi = [
+            "function isApprovedForAll(address account, address operator) public view returns (bool)",
+        ];
+
+        let NftContract = new ethers.Contract(
+            nftContractAddress,
+            nftAbi,
+            provider.getSigner()
+        );
+
+        let isApproved = await NftContract.isApprovedForAll(address, stakingContractAddress)
+
+        if (isApproved) {
+            document.getElementById('approve-button').style.display = "none"
+        }
+    }
+
+    async function approve() {
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+        let address = userAddress
+
+        let nftAbi = [
+            "function setApprovalForAll(address operator, bool approved) external",
+        ];
+
+        let NftContract = new ethers.Contract(
+            nftContractAddress,
+            nftAbi,
+            provider.getSigner()
+        );
+
+        document.getElementById('approve-button').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
+
+        try {
+            let txn = await NftContract.setApprovalForAll(stakingContractAddress, true)
+            const receipt = await txn.wait();
+
+            document.getElementById('approve-button').style.display = "none"
+        } catch (error) {
+
+            alert(error.message)
+            window.location.reload();
+        }
+
+
+    }
+
+    async function unstakeSelected() {
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+        let address = userAddress
+
+        let stakedAbi = [
+            "function withdrawSelected(uint256[] memory _tokenIds) public",
+        ];
+
+        let StakingContract = new ethers.Contract(
+            stakingContractAddress,
+            stakedAbi,
+            provider.getSigner()
+        );
+
+        if (selectedForUnstaking.length < 1) {
+            alert("You have not selected any NFTs")
+        } else {
+            document.getElementById('unstake-selected-button').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
+
+            try {
+                let txn = await StakingContract.withdrawSelected(selectedForUnstaking)
+                const receipt = await txn.wait();
+
+                window.location.reload();
+            } catch (error) {
+                alert(error.message)
+                window.location.reload();
+
+            }
+        }
+
+
+    }
+
+    async function unstakeAll() {
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+        let address = userAddress
+
+        let stakedAbi = [
+            "function withdraw() public",
+        ];
+
+        let StakingContract = new ethers.Contract(
+            stakingContractAddress,
+            stakedAbi,
+            provider.getSigner()
+        );
+
+        if (myNfts.length < 1) {
+            alert("You dont have any NFTs to unstake")
+        } else {
+            document.getElementById('unstake-all-button').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
+
+            try {
+                let txn = await StakingContract.withdraw()
+                const receipt = await txn.wait();
+
+                window.location.reload();
+            } catch (error) {
+                alert(error.message)
+                window.location.reload();
+
+            }
+        }
+
+
+    }
+
+    async function stakeNFTs() {
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+        let address = userAddress
+
+        let nftAbi = [
+            "function isApprovedForAll(address account, address operator) public view returns (bool)",
+        ];
+
+        let NftContract = new ethers.Contract(
+            nftContractAddress,
+            nftAbi,
+            provider.getSigner()
+        );
+
+        let stakedAbi = [
+            "function stakeBatch(uint256[] memory _tokenIds) public",
+        ];
+
+        let StakingContract = new ethers.Contract(
+            stakingContractAddress,
+            stakedAbi,
+            provider.getSigner()
+        );
+
+        let isApproved = await NftContract.isApprovedForAll(address, StakingContract.address)
+
+        if (!isApproved) {
+            alert("First you have to approve the staking contract")
+        }
+        else if (selectedForStaking.length < 1) {
+            alert("Please select a minimum of 1 NFT for staking")
+        }
+        else {
+
+            document.getElementById('stake-button').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
+
+            try {
+                let txn = await StakingContract.stakeBatch(selectedForStaking)
+                const receipt = await txn.wait();
+                window.location.reload();
+            } catch (error) {
+                alert(error.message)
+                window.location.reload();
+            }
+        }
+
+
+    }
+
+    async function insertStakedWallet() {
+        var ethersProvider = new ethers.providers.JsonRpcProvider(
+            networkProvider
+        );
+
+        let stakedAbi = [
+            "function stakeIds(address _staker) public view returns (uint256[] memory)",
+        ];
+
+        let HBB = new ethers.Contract(
+            stakingContractAddress,
+            stakedAbi,
+            ethersProvider
+        );
+
+        let address = userAddress
+
+        let stakedIds = await HBB.stakeIds(address)
+        myNfts = stakedIds.map(Number)
+
+        document.getElementById('total-nfts-staked').innerText = `${myNfts.length}`;
+
+        let nftHtml = "";
+        for (const nft of myNfts) {
+            nftHtml += ` <div id="${nft}" class="hbb-blocks staked"> <img style="border-radius: 20px" src="https://ipfs.io/ipfs/QmTF4KAF2tnJw5y2WAuotadJEBdUQbuog5GcUru4Zkq71X/${nft}.png" max-width="200px" max-height="200px"></div>`
+        }
+        document.getElementById('staked-image-wrapper').innerHTML = nftHtml;
+
+        const divs = document.querySelectorAll('.staked');
+
+        divs.forEach(el => el.addEventListener('click', event => {
+            let nftId = event.currentTarget.getAttribute("id")
+
+            if (selectedForUnstaking.includes(nftId)) {
+                selectedForUnstaking = selectedForUnstaking.filter(item => item !== nftId)
+                event.currentTarget.style.border = "0px"
+                event.currentTarget.style.borderStyle = "solid"
+                event.currentTarget.style.backgroundColor = "transparent"
+                event.currentTarget.style.borderColor = "transparent"
+            } else {
+                selectedForUnstaking.push(nftId)
+                event.currentTarget.style.border = "5px"
+                event.currentTarget.style.borderStyle = "solid"
+                event.currentTarget.style.backgroundColor = "green"
+                event.currentTarget.style.borderColor = "green"
+            }
+            document.getElementById('unstake-selected-button').innerText = `UNSTAKE (${selectedForUnstaking.length})`;
+        }));
+    }
+
+    async function insertNFTWallet() {
+        var ethersProvider = new ethers.providers.JsonRpcProvider(
+            networkProvider
+        );
+
+        let erc1155 = [
+            "event TransferSingle(address indexed operator, address indexed from, address indexed to, uint256 id, uint256 value)",
+            "event TransferBatch(address indexed operator,address indexed from,address indexed to,uint256[] ids,uint256[] values)",
+            "function balanceOfBatch(address[] calldata accounts, uint256[] calldata ids) external view returns (uint256[] memory)"
+        ];
+
+        let HBB = new ethers.Contract(
+            nftContractAddress,
+            erc1155,
+            ethersProvider
+        );
+
+        let address = userAddress
+
+        let txnsInSingle = HBB.filters.TransferSingle(null, null, address);
+        let resultsInSingle = HBB.queryFilter(txnsInSingle)
+
+        let txnInBatch = HBB.filters.TransferBatch(null, null, address);
+        let resultsInBatch = HBB.queryFilter(txnInBatch)
+
+        const txns = await Promise.all([resultsInSingle, resultsInBatch])
+
+        let nft1 = txns[0].map((x) => x.args.id.toString())
+        nft2 = []
+        for (const txn of txns[1]) {
+            nft2 = nft2.concat(txn.args.ids.map(String))
+        }
+
+        let tempNfts = nft1.concat(nft2)
+        let nfts = [...new Set(tempNfts)];
+
+        let batch = await HBB.balanceOfBatch(Array(nfts.length).fill(address), nfts)
+        let balance = batch.map(Number)
+
+        let indexes = getAllIndexes(balance, 1)
+        let myNfts = nfts.filter((x, i) => indexes.includes(i))
+
+        let nftHtml = "";
+        for (const nft of myNfts) {
+            nftHtml += ` <div id="${nft}" class="hbb-blocks unstaked"> <img style="border-radius: 20px" src="https://ipfs.io/ipfs/QmTF4KAF2tnJw5y2WAuotadJEBdUQbuog5GcUru4Zkq71X/${nft}.png" max-width="200px" max-height="200px"></div>`
+        }
+        document.getElementById('wallet-image-wrapper').innerHTML = nftHtml;
+
+        const divs = document.querySelectorAll('.unstaked');
+
+        divs.forEach(el => el.addEventListener('click', event => {
+            let nftId = event.currentTarget.getAttribute("id")
+
+            if (selectedForStaking.includes(nftId)) {
+                selectedForStaking = selectedForStaking.filter(item => item !== nftId)
+                event.currentTarget.style.border = "0px"
+                event.currentTarget.style.borderStyle = "solid"
+                event.currentTarget.style.backgroundColor = "transparent"
+                event.currentTarget.style.borderColor = "transparent"
+            } else {
+                selectedForStaking.push(nftId)
+                event.currentTarget.style.border = "5px"
+                event.currentTarget.style.borderStyle = "solid"
+                event.currentTarget.style.backgroundColor = "green"
+                event.currentTarget.style.borderColor = "green"
+            }
+            document.getElementById('stake-button').innerText = `STAKE (${selectedForStaking.length})`;
+        }));
+    }
+
+    function getAllIndexes(arr, val) {
+        var indexes = [], i;
+        for (i = 0; i < arr.length; i++)
+            if (arr[i] === val)
+                indexes.push(i);
+        return indexes;
+    }
+    async function updateNftStats() {
+        let url = "https://eth-mainnet.alchemyapi.io/v2/Wq9Q8vRbE6Spk184NPdedK15LyhgRa4N"
+        let contractAddress = "0x630f9ff82F82A68671dF290fFAEC2D767Df77a07"
+        let provider = new ethers.providers.JsonRpcProvider(url);
+
+        let abi = [
+            "function nftsAvailable() public view returns(uint)",
+            "function tokenCount() public view returns(uint)"
+        ];
+
+        let contract = new ethers.Contract(
+            contractAddress,
+            abi,
+            provider
+        );
+
+        let tokenCount = await contract.tokenCount()
+        let nftsAvailable = await contract.nftsAvailable()
+
+        document.getElementById("nft-stats").innerText = `${tokenCount} / ${nftsAvailable}`
+    }
+
+    function getMintAmount() {
+        var select = document.getElementById('Number-of-Mints');
+        var value = select.options[select.selectedIndex].value;
+        return value
+    }
+
+    async function mint() {
+
+        let contractAddress = "0x630f9ff82F82A68671dF290fFAEC2D767Df77a07"
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+        let amount = getMintAmount();
+
+        let abi = [
+            "function mintBatch(uint256 amount) public payable returns(uint256 id)",
+            "function cost() public view returns(uint)"
+        ];
+
+        let contract = new ethers.Contract(
+            contractAddress,
+            abi,
+            provider.getSigner()
+        );
+
+        document.getElementById('mint-button').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
+
+        try {
+            let price = await contract.cost()
+            let txn = await contract.mintBatch(amount, { value: price.mul(amount) })
+            const receipt = await txn.wait();
+
+            // deactivateLoading()
+            window.location.reload();
+        } catch (error) {
+            alert(error.message)
+            window.location.reload();
+
+            // deactivateLoading()
+        }
+
+    }
+
+    async function connectWalletStake() {
+
+        if (!window.ethereum) { alert("No Wallet Detected") }
+        else if (window.ethereum.networkVersion != 1) {
+            alert("Wrong Network. Please connect to Ethereum Network")
+        }
+        else {
+            const [address] = await window.ethereum.enable();
+
+            userAddress = address
+            // When user changes their account.
+            window.ethereum.on("accountsChanged", ([newAddress]) => {
+                // Reload page
+                window.location.reload();
+            });
+            // When user changes their network.
+            window.ethereum.on("chainChanged", ([newChainId]) => {
+                // Reload Page
+                window.location.reload();
+            });
+
+            let first = address.substring(0, 5)
+            let last = address.slice(-4)
+            let miniAddress = `${first}....${last}`
+
+            var element = document.getElementById("connect-button-stake");
+            element.innerHTML = miniAddress;
+
+            document.getElementById("connect-button-stake").style.cursor = "default";
+
+            insertNFTWallet()
+            insertStakedWallet()
+            hideApprove()
+            getAvailableReward()
+            getBonusRewards()
+            getTokenBalance()
+        }
+    }
+
+    async function connectWallet() {
+
+        if (!window.ethereum) { alert("No Wallet Detected") }
+        else if (window.ethereum.networkVersion != 1) {
+            alert("Wrong Network. Please connect to Ethereum Network")
+        }
+        else {
+            const [address] = await window.ethereum.enable();
+
+            // When user changes their account.
+            window.ethereum.on("accountsChanged", ([newAddress]) => {
+                // Reload page
+                window.location.reload();
+            });
+            // When user changes their network.
+            window.ethereum.on("chainChanged", ([newChainId]) => {
+                // Reload Page
+                window.location.reload();
+            });
+
+            let first = address.substring(0, 5)
+            let last = address.slice(-4)
+            let miniAddress = `${first}....${last}`
+
+            var element = document.getElementById("connect-button");
+            element.innerHTML = miniAddress;
+
+            document.getElementById("connect-button").style.cursor = "default";
+            document.getElementById("mint-form").style.display = "block";
+
+        }
+    }
+
+</script>
+<style>
+    .hbb-blocks img {
+        cursor: pointer;
+    }
+
+    .buttonload {
+        background-color: #04AA6D;
+        /* Green background */
+        border: none;
+        /* Remove borders */
+        color: white;
+        /* White text */
+        padding: 12px 24px;
+        /* Some padding */
+        font-size: 16px;
+        /* Set a font-size */
+    }
+
+    /* Add a right margin to each icon */
+    .fa {
+        /* margin-left: -12px;
+      margin-right: 8px; */
+    }
+</style>
