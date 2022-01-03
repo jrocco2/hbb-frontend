@@ -488,7 +488,7 @@
     async function connectWalletStake() {
 
         if (!window.ethereum) { alert("No Wallet Detected") }
-        else if (window.ethereum.networkVersion != 1) {
+        else if (window.ethereum.networkVersion != networkVersion) {
             alert("Wrong Network. Please connect to Ethereum Network")
         }
         else {
