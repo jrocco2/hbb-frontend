@@ -5,11 +5,11 @@
     let selectedForStaking = []
     let selectedForUnstaking = []
     let myNfts = []
-    let nftContractAddress = window.location.pathname == '/stake-new' ? "0xCffeE022a7957a4511BED925C2F8082ac8Ebc212" : "0x630f9ff82F82A68671dF290fFAEC2D767Df77a07"
-    let stakingContractAddress = window.location.pathname == '/stake-new' ? "0x3d1ba82B855315eD50ecaaA433C06341FB4351A2" : "0xaf2e1e2fB8AAB3cB951ADcBC3dc448Af52603f7A"
-    let tokenContractAddress = window.location.pathname == '/stake-new' ? "0x2c533979dc00CF80bb86cfCA7B642a299b84E972" : "0x2D163701bF3920fF1b1AD0e3B1d0e0d5747CF067"
-    let networkProvider = window.location.pathname == '/stake-new' ? "https://eth-rinkeby.alchemyapi.io/v2/8oRBMOP0aaJmo_5lA4tzHm8Eae-Rwx_g" : "https://eth-mainnet.alchemyapi.io/v2/Wq9Q8vRbE6Spk184NPdedK15LyhgRa4N"
-    let networkVersion = window.location.pathname == '/stake-new' ? 4 : 1
+    let nftContractAddress = "0x630f9ff82F82A68671dF290fFAEC2D767Df77a07"
+    let stakingContractAddress = window.location.pathname == '/stake-new' ? "0x361372320A5fbAADF41c9F0829C66819a1510836" : "0xaf2e1e2fB8AAB3cB951ADcBC3dc448Af52603f7A"
+    let tokenContractAddress = "0x2D163701bF3920fF1b1AD0e3B1d0e0d5747CF067"
+    let networkProvider = "https://eth-mainnet.alchemyapi.io/v2/Wq9Q8vRbE6Spk184NPdedK15LyhgRa4N"
+    let networkVersion = 1
     window.onload = function () {
 
         var mintButton = document.getElementById('mint-button')
