@@ -684,9 +684,7 @@
         }));
     }
     async function hunt(name, isExpress=false) {
-        var ethersProvider = new ethers.providers.JsonRpcProvider(
-            huntingNetworkProvider
-        );
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
 
         let huntAbi = [
             "function startGame(string memory name,uint256 tokenId,bool isExpress)",
@@ -695,7 +693,7 @@
         let ScavengerHunt = new ethers.Contract(
             scavengerHuntAddress,
             huntAbi,
-            ethersProvider.getSigner()
+            provider.getSigner()
         );
 
         document.getElementById('hunt-timer').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
