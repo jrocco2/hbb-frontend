@@ -4,6 +4,7 @@
     let userAddress = ""
     let selectedForStaking = []
     let selectedForUnstaking = []
+    let selectedNft;
     let myNfts = []
     let nftContractAddress = "0x630f9ff82F82A68671dF290fFAEC2D767Df77a07"
     let stakingContractAddress = window.location.pathname == '/stake-new' ? "0x361372320A5fbAADF41c9F0829C66819a1510836" : "0xaf2e1e2fB8AAB3cB951ADcBC3dc448Af52603f7A"
@@ -11,6 +12,7 @@
     let networkProvider = "https://eth-mainnet.alchemyapi.io/v2/Wq9Q8vRbE6Spk184NPdedK15LyhgRa4N"
     let huntingNetworkProvider = "https://eth-rinkeby.alchemyapi.io/v2/df-3YgaL0V-V0leLzSxIw-ifNK1wUbq4"
     let huntingNftContractAddress = "0x1cf8e3a0894b93E3849E7A4c1F6912fb2E7bD31A"
+    let scavengerHuntAddress = "0xc38c3eaA6ddED4c6880483992dC086BAAd00E12E"
     let huntingNetworkVersion = 4
     let networkVersion = 1
     window.onload = function () {
@@ -67,7 +69,12 @@
             console.log("Training Ground Connected")
             connectWalletHunt()
             console.log("Finished Connecting")
-
+            document.getElementById('hunt-button').onclick = function () {
+                hunt("Training Ground", false)
+            };
+            document.getElementById('hunt-button-express').onclick = function () {
+                hunt("Training Ground", true)
+            };
         }
 
 
@@ -660,7 +667,7 @@
 
         divs.forEach(el => el.addEventListener('click', event => {
             let nftId = event.currentTarget.getAttribute("id")
-
+            selectedNft = nftId
             for (const nft of myNfts) {
                 document.getElementById(nft).style.border = "0px"
                 document.getElementById(nft).style.borderStyle = "solid"
@@ -674,6 +681,26 @@
             event.currentTarget.style.borderColor = "green"
             // document.getElementById('stake-button').innerText = `STAKE (${selectedForStaking.length})`;
         }));
+    }
+    async function hunt(name, isExpress=false) {
+        var ethersProvider = new ethers.providers.JsonRpcProvider(
+            huntingNetworkProvider
+        );
+
+        let huntAbi = [
+            "function startGame(string memory name,uint256 tokenId,bool isExpress)",
+        ];
+
+        let ScavengerHunt = new ethers.Contract(
+            scavengerHuntAddress,
+            huntAbi,
+            ethersProvider
+        );
+
+        document.getElementById('hunt-timer').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
+        console.log(`Starting game called: ${name}, with tokenId: ${selectedNft}, express = ${isExpress}`)
+        await ScavengerHunt.startGame(name, selectedNft, isExpress)
+        window.location.reload();
     }
 
     async function connectWalletHunt() {
