@@ -668,6 +668,7 @@
         divs.forEach(el => el.addEventListener('click', event => {
             let nftId = event.currentTarget.getAttribute("id")
             selectedNft = nftId
+            console.log("Selected NFT: ", selectedNft)
             for (const nft of myNfts) {
                 document.getElementById(nft).style.border = "0px"
                 document.getElementById(nft).style.borderStyle = "solid"
@@ -694,7 +695,7 @@
         let ScavengerHunt = new ethers.Contract(
             scavengerHuntAddress,
             huntAbi,
-            ethersProvider
+            ethersProvider.getSigner()
         );
 
         document.getElementById('hunt-timer').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
