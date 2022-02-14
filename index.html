@@ -678,7 +678,7 @@
     async function connectWalletHunt() {
 
         if (!window.ethereum) { alert("No Wallet Detected") }
-        else if (window.ethereum.networkVersion != networkVersion) {
+        else if (window.ethereum.networkVersion != huntingNetworkVersion) {
             alert("Wrong Network. Please connect to Ethereum Network")
         }
         else {
