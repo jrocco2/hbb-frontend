@@ -661,19 +661,17 @@
         divs.forEach(el => el.addEventListener('click', event => {
             let nftId = event.currentTarget.getAttribute("id")
 
-            if (selectedForStaking.includes(nftId)) {
-                selectedForStaking = selectedForStaking.filter(item => item !== nftId)
-                event.currentTarget.style.border = "0px"
-                event.currentTarget.style.borderStyle = "solid"
-                event.currentTarget.style.backgroundColor = "transparent"
-                event.currentTarget.style.borderColor = "transparent"
-            } else {
-                selectedForStaking.push(nftId)
-                event.currentTarget.style.border = "5px"
-                event.currentTarget.style.borderStyle = "solid"
-                event.currentTarget.style.backgroundColor = "green"
-                event.currentTarget.style.borderColor = "green"
+            for (const nft of myNfts) {
+                document.getElementById(nft).style.border = "0px"
+                document.getElementById(nft).style.borderStyle = "solid"
+                document.getElementById(nft).style.backgroundColor = "transparent"
+                document.getElementById(nft).style.borderColor = "transparent"
             }
+
+            event.currentTarget.style.border = "5px"
+            event.currentTarget.style.borderStyle = "solid"
+            event.currentTarget.style.backgroundColor = "green"
+            event.currentTarget.style.borderColor = "green"
             // document.getElementById('stake-button').innerText = `STAKE (${selectedForStaking.length})`;
         }));
     }
