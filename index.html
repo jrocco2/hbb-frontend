@@ -740,7 +740,8 @@
             provider
         );
 
-        let allowance = await HBC.allowance(await provider.getSigner().getAddress(), scavengerHuntAddress)
+        let addr = await provider.getSigner().getAddress()
+        let allowance = await HBC.allowance(addr, scavengerHuntAddress)
 
         if (allowance.gt(0)) {
             document.getElementById('approve-hunt-button').style.display = "none"
