@@ -70,7 +70,13 @@
         var trainingGround = document.getElementById('Training-Ground')
         if (trainingGround) {
             console.log("Training Ground Connected")
-            connectWalletHunt()
+            document.getElementById('hunt-connect-1').onclick = function () {
+                connectWalletHunt()
+            };
+            document.getElementById('hunt-connect-2').onclick = function () {
+                connectWalletHunt()
+            };
+            
             console.log("Finished Connecting")
             document.getElementById('hunt-button').onclick = function () {
                 hunt("Training Ground", false)
@@ -780,10 +786,12 @@
             let last = address.slice(-4)
             let miniAddress = `${first}....${last}`
 
-            // var element = document.getElementById("connect-button-hunt");
-            // element.innerHTML = miniAddress;
+            var element = document.getElementById("hunt-connect-2");
+            element.innerHTML = miniAddress;
 
-            // document.getElementById("connect-button-hunt").style.cursor = "default";
+            document.getElementById('hunt-connect-1').style.display = "none"
+
+            document.getElementById("hunt-connect-2").style.cursor = "default";
 
             insertHuntingNFTWallet()
         }
