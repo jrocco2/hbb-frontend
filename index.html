@@ -96,7 +96,6 @@
             approveButton.onclick = function () {
                 approveUnlimitedHBCTokens()
             };
-            checkApproveLimit()
         }
 
 
@@ -866,6 +865,7 @@
         } else {
             document.getElementById('hunt-button').style.display = "none"
             document.getElementById('hunt-button-express').style.display = "none"
+            document.getElementById('approve-hunt-button').style.display = "block"
         }
     }
 
@@ -904,6 +904,8 @@
             document.getElementById("hunt-connect-2").style.cursor = "default";
 
             insertHuntingNFTWallet(gameName)
+            checkApproveLimit()
+
         }
     }
 
