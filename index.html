@@ -17,6 +17,7 @@
     let scavengerHuntAddress = "0xc38c3eaA6ddED4c6880483992dC086BAAd00E12E"
     let huntingNetworkVersion = 4
     let hbcHuntAddress = "0x02efc18D95fC19abD36aa54193Aa0d3f8D78C472"
+    let scavengerHuntGameDuration;
     let networkVersion = 1
     window.onload = function () {
 
@@ -703,8 +704,7 @@
                     let startTime = gameInfo.timestamp * 1000
                     let now = Date.now()
                     let diff = now - startTime
-                    let timeRemaining = gameInfo.duration - diff
-                    console.log("Duration: ", gameInfo.duration)
+                    let timeRemaining = scavengerHuntGameDuration - diff
                     console.log(gameInfo.timestamp, startTime, now, diff, timeRemaining)
                     //                              1644873238000 1645192187514 318949514 NaN
 
@@ -748,8 +748,9 @@
         try {
             let info = await ScavengerHunt.gameInfo(tokenId)
             let game = await ScavengerHunt.games(gameName)
-            info.duration = game.duration
+            scavengerHuntGameDuration = game.duration
             console.log("GameInfo: ", game)
+            console.log("scavengerHuntGameDuration: ", scavengerHuntGameDuration)
             console.log("Info: ", info)
             return info
         } catch (error) {
