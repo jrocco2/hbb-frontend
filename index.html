@@ -71,22 +71,26 @@
 
         var trainingGround = document.getElementById('Training-Ground')
         if (trainingGround) {
-            console.log("Training Ground Connected")
+            let name = "Training Ground"
+            console.log(`${name} Connected`)
             document.getElementById('hunt-connect-1').onclick = function () {
-                connectWalletHunt("Training Ground")
+                connectWalletHunt(name)
             };
             document.getElementById('hunt-connect-2').onclick = function () {
-                connectWalletHunt("Training Ground")
+                connectWalletHunt(name)
             };
 
             console.log("Finished Connecting")
             document.getElementById('hunt-button').onclick = function () {
-                hunt("Training Ground", false)
+                hunt(name, false)
             };
             document.getElementById('hunt-button-express').onclick = function () {
-                hunt("Training Ground", true)
+                hunt(name, true)
             };
 
+            document.getElementById('end-hunt-button').onclick = function () {
+                endHunt(name)
+            };
             let approveButton = document.getElementById('approve-hunt-button')
             approveButton.onclick = function () {
                 approveUnlimitedHBCTokens()
@@ -714,15 +718,18 @@
                     } else {
                         document.getElementById('hunt-timer').innerHTML = `00:00:00`
                     }
-                    console.log("I have no idea what im doing")
-                    console.log("I have no idea what im doing")
-                    console.log("I have no idea what im doing")
+                    document.getElementById('end-hunt-button').style.display = "block"
+                    document.getElementById('hunt-button-express').style.display = "none"
+                    document.getElementById('hunt-button').style.display = "none"
                     if (true) {
                         console.log("Its true")
                     }
                 } else {
                     document.getElementById('hunt-timer').innerHTML = `00:00:00`
+                    document.getElementById('hunt-button-express').style.display = "block"
+                    document.getElementById('hunt-button').style.display = "block"
                 }
+
             });
 
         }));
@@ -762,6 +769,30 @@
         }
 
 
+    }
+    async function endHunt(name) {
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+
+        let huntAbi = [
+            "function endGame(string name, uint256 tokenId)",
+        ];
+
+        let ScavengerHunt = new ethers.Contract(
+            scavengerHuntAddress,
+            huntAbi,
+            provider.getSigner()
+        );
+
+        document.getElementById('hunt-timer').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
+
+        try {
+            let txn = await ScavengerHunt.endGame(name, selectedNft)
+            const receipt = await txn.wait();
+            window.location.reload();
+        } catch (error) {
+            alert(error.message)
+            window.location.reload();
+        }
     }
     async function hunt(name, isExpress = false) {
         let provider = new ethers.providers.Web3Provider(window.ethereum);
