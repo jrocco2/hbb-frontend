@@ -704,7 +704,9 @@
                     let now = Date.now()
                     let diff = now - startTime
                     let timeRemaining = gameInfo.duration - diff
+                    console.log("Duration: ", gameInfo.duration)
                     console.log(gameInfo.timestamp, startTime, now, diff, timeRemaining)
+                    //                              1644873238000 1645192187514 318949514 NaN
 
                     if (timeRemaining > 0) {
                         document.getElementById('hunt-timer').innerHTML = `${timeRemaining}`
