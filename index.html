@@ -18,6 +18,7 @@
     let huntingNetworkVersion = 4
     let hbcHuntAddress = "0x02efc18D95fC19abD36aa54193Aa0d3f8D78C472"
     let scavengerHuntGameDuration;
+    let scavengerHuntExpressFactor;
     let networkVersion = 1
     window.onload = function () {
 
@@ -704,7 +705,8 @@
                     let startTime = gameInfo.timestamp * 1000
                     let now = Date.now()
                     let diff = now - startTime
-                    let timeRemaining = scavengerHuntGameDuration - diff
+                    let duration = gameInfo.isExpress ? (scavengerHuntGameDuration / scavengerHuntExpressFactor) : scavengerHuntGameDuration
+                    let timeRemaining = msToHMS(duration - diff)
                     console.log(gameInfo.timestamp, startTime, now, diff, timeRemaining)
 
                     if (timeRemaining > 0) {
@@ -713,13 +715,34 @@
                         document.getElementById('hunt-timer').innerHTML = `00:00:00`
                     }
 
-                    
+
                 } else {
                     document.getElementById('hunt-timer').innerHTML = `00:00:00`
                 }
+
+                // gameName: "Training Ground"
+                // isExpress: false
+                // timestamp: BigNumber {_hex: '0x620ac616', _isBigNumber
+
+                // gameName: ""
+                // isExpress: false
+                // timestamp: BigNumber {_hex: '0x00', _isBigNumber: true}
             });
 
         }));
+    }
+
+    function msToHMS(ms) {
+        // 1- Convert to seconds:
+        let seconds = ms / 1000;
+        // 2- Extract hours:
+        const hours = parseInt(seconds / 3600); // 3,600 seconds in 1 hour
+        seconds = seconds % 3600; // seconds remaining after extracting hours
+        // 3- Extract minutes:
+        const minutes = parseInt(seconds / 60); // 60 seconds in 1 minute
+        // 4- Keep only seconds not extracted to minutes:
+        seconds = parseInt( seconds % 60) ;
+        alert(hours + ":" + minutes + ":" + seconds);
     }
 
     async function getGameInfo(tokenId, gameName) {
