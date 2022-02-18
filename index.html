@@ -706,11 +706,11 @@
                     let now = Date.now()
                     let diff = now - startTime
                     let duration = gameInfo.isExpress ? (scavengerHuntGameDuration / scavengerHuntExpressFactor) : scavengerHuntGameDuration
-                    let timeRemaining = msToHMS(duration - diff)
+                    let timeRemaining = duration - diff
                     console.log(gameInfo.timestamp, startTime, now, diff, timeRemaining)
 
                     if (timeRemaining > 0) {
-                        document.getElementById('hunt-timer').innerHTML = `${timeRemaining}`
+                        document.getElementById('hunt-timer').innerHTML = `${msToHMS(timeRemaining)}`
                     } else {
                         document.getElementById('hunt-timer').innerHTML = `00:00:00`
                     }
@@ -719,13 +719,7 @@
                 } else {
                     document.getElementById('hunt-timer').innerHTML = `00:00:00`
                 }
-                console.log("BUMP")
-                console.log("BUMP")
-                console.log("BUMP")
-                console.log("BUMP")
-                console.log("BUMP")
-                console.log("BUMP")
-                console.log("BUMP")
+
                 // gameName: "Training Ground"
                 // isExpress: false
                 // timestamp: BigNumber {_hex: '0x620ac616', _isBigNumber
@@ -744,10 +738,7 @@
         seconds = seconds % 3600; // seconds remaining after extracting hours
         const minutes = parseInt(seconds / 60); // 60 seconds in 1 minute
         seconds = parseInt(seconds % 60);
-        console.log("BUMP")
-        console.log("BUMP")
-        console.log("BUMP")
-        console.log("BUMP")
+
         return (hours + ":" + minutes + ":" + seconds);
     }
 
