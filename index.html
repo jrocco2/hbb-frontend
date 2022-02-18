@@ -18,7 +18,7 @@
     let huntingNetworkVersion = 4
     let hbcHuntAddress = "0x02efc18D95fC19abD36aa54193Aa0d3f8D78C472"
     let scavengerHuntGameDuration;
-    let scavengerHuntExpressFactor;
+    let scavengerHuntExpressFactor = 2;
     let scavengerHuntTimeRemaining;
     let networkVersion = 1
     window.onload = function () {
@@ -711,7 +711,7 @@
                     let diff = now - startTime
                     let duration = gameInfo.isExpress ? (scavengerHuntGameDuration / scavengerHuntExpressFactor) : scavengerHuntGameDuration
                     scavengerHuntTimeRemaining = duration - diff
-                    console.log(gameInfo.timestamp, startTime, now, diff, scavengerHuntTimeRemaining)
+                    console.log(gameInfo.timestamp, startTime, now, diff, scavengerHuntTimeRemaining, duration, scavengerHuntExpressFactor)
 
                     if (scavengerHuntTimeRemaining > 0) {
                         document.getElementById('hunt-timer').innerHTML = `${msToHMS(scavengerHuntTimeRemaining)}`
@@ -721,9 +721,7 @@
                     document.getElementById('end-hunt-button').style.display = "block"
                     document.getElementById('hunt-button-express').style.display = "none"
                     document.getElementById('hunt-button').style.display = "none"
-                    if (true) {
-                        console.log("Its true")
-                    }
+
                 } else {
                     document.getElementById('hunt-timer').innerHTML = `00:00:00`
                     document.getElementById('hunt-button-express').style.display = "block"
