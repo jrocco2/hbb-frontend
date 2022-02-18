@@ -697,8 +697,7 @@
             event.currentTarget.style.borderColor = "green"
 
             document.getElementById('hunt-timer').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
-            console.log("Getting game info")
-            let gameInfo = getGameInfo(tokenId)
+            let gameInfo = (async()=> await getGameInfo(selectedNft))()
             console.log(gameInfo)
             document.getElementById('hunt-timer').innerHTML = `00:00:00`
 
