@@ -19,6 +19,7 @@
     let hbcHuntAddress = "0x02efc18D95fC19abD36aa54193Aa0d3f8D78C472"
     let scavengerHuntGameDuration;
     let scavengerHuntExpressFactor;
+    let scavengerHuntTimeRemaining;
     let networkVersion = 1
     window.onload = function () {
 
@@ -710,11 +711,11 @@
                     let now = Date.now()
                     let diff = now - startTime
                     let duration = gameInfo.isExpress ? (scavengerHuntGameDuration / scavengerHuntExpressFactor) : scavengerHuntGameDuration
-                    let timeRemaining = duration - diff
-                    console.log(gameInfo.timestamp, startTime, now, diff, timeRemaining)
+                    scavengerHuntTimeRemaining = duration - diff
+                    console.log(gameInfo.timestamp, startTime, now, diff, scavengerHuntTimeRemaining)
 
-                    if (timeRemaining > 0) {
-                        document.getElementById('hunt-timer').innerHTML = `${msToHMS(timeRemaining)}`
+                    if (scavengerHuntTimeRemaining > 0) {
+                        document.getElementById('hunt-timer').innerHTML = `${msToHMS(scavengerHuntTimeRemaining)}`
                     } else {
                         document.getElementById('hunt-timer').innerHTML = `00:00:00`
                     }
@@ -728,6 +729,7 @@
                     document.getElementById('hunt-timer').innerHTML = `00:00:00`
                     document.getElementById('hunt-button-express').style.display = "block"
                     document.getElementById('hunt-button').style.display = "block"
+                    document.getElementById('end-hunt-button').style.display = "none"
                 }
 
             });
@@ -771,6 +773,10 @@
 
     }
     async function endHunt(name) {
+        if (scavengerHuntTimeRemaining > 0) {
+            alert("The game has not ended yet")
+            return;
+        }
         let provider = new ethers.providers.Web3Provider(window.ethereum);
 
         let huntAbi = [
