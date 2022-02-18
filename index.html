@@ -749,6 +749,8 @@
             let info = await ScavengerHunt.gameInfo(tokenId)
             let game = await ScavengerHunt.games(gameName)
             info.duration = game.duration
+            console.log("GameInfo: ", gameInfo)
+            console.log("Info: ", info)
             return info
         } catch (error) {
             alert(error.message)
