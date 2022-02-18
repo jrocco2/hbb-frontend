@@ -706,7 +706,6 @@
                     let diff = now - startTime
                     let timeRemaining = scavengerHuntGameDuration - diff
                     console.log(gameInfo.timestamp, startTime, now, diff, timeRemaining)
-                    //                              1644873238000 1645192187514 318949514 NaN
 
                     if (timeRemaining > 0) {
                         document.getElementById('hunt-timer').innerHTML = `${timeRemaining}`
@@ -748,10 +747,7 @@
         try {
             let info = await ScavengerHunt.gameInfo(tokenId)
             let game = await ScavengerHunt.games(gameName)
-            scavengerHuntGameDuration = game.duration
-            console.log("GameInfo: ", game)
-            console.log("scavengerHuntGameDuration: ", scavengerHuntGameDuration)
-            console.log("Info: ", info)
+            scavengerHuntGameDuration = game.duration * 1000
             return info
         } catch (error) {
             alert(error.message)
