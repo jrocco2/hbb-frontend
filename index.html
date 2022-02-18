@@ -76,7 +76,7 @@
             document.getElementById('hunt-connect-2').onclick = function () {
                 connectWalletHunt()
             };
-            
+
             console.log("Finished Connecting")
             document.getElementById('hunt-button').onclick = function () {
                 hunt("Training Ground", false)
@@ -696,7 +696,35 @@
             event.currentTarget.style.backgroundColor = "green"
             event.currentTarget.style.borderColor = "green"
 
+            document.getElementById('hunt-timer').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
+            let gameInfo = await getGameInfo(tokenId)
+            console.log(gameInfo)
+            document.getElementById('hunt-timer').innerHTML = `00:00:00`
+
         }));
+    }
+
+    async function getGameInfo(tokenId) {
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+
+        let huntAbi = [
+            "function gameInfo(uint256) view returns (uint256 timestamp, string gameName, bool isExpress)"
+        ];
+
+        let ScavengerHunt = new ethers.Contract(
+            scavengerHuntAddress,
+            huntAbi,
+            provider
+        );
+
+        try {
+            let info = await ScavengerHunt.gameInfo(tokenId)
+            return info
+        } catch (error) {
+            alert(error.message)
+        }
+
+
     }
     async function hunt(name, isExpress = false) {
         let provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -713,9 +741,15 @@
 
         document.getElementById('hunt-timer').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
         console.log(`Starting game called: ${name}, with tokenId: ${selectedNft}, express = ${isExpress}`)
-        let txn = await ScavengerHunt.startGame(name, selectedNft, isExpress)
-        const receipt = await txn.wait();
-        window.location.reload();
+        try {
+            let txn = await ScavengerHunt.startGame(name, selectedNft, isExpress)
+            const receipt = await txn.wait();
+            window.location.reload();
+        } catch (error) {
+            alert(error.message)
+            window.location.reload();
+
+        }
     }
 
     async function approveUnlimitedHBCTokens() {
@@ -790,7 +824,9 @@
             element.innerHTML = miniAddress;
 
             document.getElementById('hunt-connect-1').style.display = "none"
-
+            document.getElementById('hunt-connect-2').onclick = function () {
+                console.log("No action")
+            };
             document.getElementById("hunt-connect-2").style.cursor = "default";
 
             insertHuntingNFTWallet()
