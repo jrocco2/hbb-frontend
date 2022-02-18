@@ -71,10 +71,10 @@
         if (trainingGround) {
             console.log("Training Ground Connected")
             document.getElementById('hunt-connect-1').onclick = function () {
-                connectWalletHunt()
+                connectWalletHunt("Training Ground")
             };
             document.getElementById('hunt-connect-2').onclick = function () {
-                connectWalletHunt()
+                connectWalletHunt("Training Ground")
             };
 
             console.log("Finished Connecting")
@@ -630,7 +630,7 @@
         }
     }
 
-    async function insertHuntingNFTWallet() {
+    async function insertHuntingNFTWallet(gameName) {
         var ethersProvider = new ethers.providers.JsonRpcProvider(
             huntingNetworkProvider
         );
@@ -697,19 +697,44 @@
             event.currentTarget.style.borderColor = "green"
 
             document.getElementById('hunt-timer').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
-            let gameInfo = getGameInfo(selectedNft).then((gameInfo) => {
-                console.log(gameInfo)
-                document.getElementById('hunt-timer').innerHTML = `00:00:00`
+            let gameInfo = getGameInfo(selectedNft, gameName).then((gameInfo) => {
+
+                if (gameInfo.timestamp.gt(0) && gameInfo.gameName == gameName) {
+                    let startTime = gameInfo.timestamp * 1000
+                    let now = Date.now()
+                    let diff = now - startTime
+                    let timeRemaining = gameInfo.duration - diff
+                    console.log(gameInfo.timestamp, startTime, now, diff, timeRemaining)
+
+                    if (timeRemaining > 0) {
+                        document.getElementById('hunt-timer').innerHTML = `${timeRemaining}`
+                    } else {
+                        document.getElementById('hunt-timer').innerHTML = `00:00:00`
+                    }
+
+                    
+                } else {
+                    document.getElementById('hunt-timer').innerHTML = `00:00:00`
+                }
+                
+                // gameName: "Training Ground"
+                // isExpress: false
+                // timestamp: BigNumber {_hex: '0x620ac616', _isBigNumber
+
+                // gameName: ""
+                // isExpress: false
+                // timestamp: BigNumber {_hex: '0x00', _isBigNumber: true}
             });
 
         }));
     }
 
-    async function getGameInfo(tokenId) {
+    async function getGameInfo(tokenId, gameName) {
         let provider = new ethers.providers.Web3Provider(window.ethereum);
 
         let huntAbi = [
-            "function gameInfo(uint256) view returns (uint256 timestamp, string gameName, bool isExpress)"
+            "function gameInfo(uint256) view returns (uint256 timestamp, string gameName, bool isExpress)",
+            "function games(string) view returns (string name, uint256 cost, uint256 duration, bool isEnabled)"
         ];
 
         let ScavengerHunt = new ethers.Contract(
@@ -720,6 +745,8 @@
 
         try {
             let info = await ScavengerHunt.gameInfo(tokenId)
+            let game = await ScavengerHunt.games(gameName)
+            info.duration = game.duration
             return info
         } catch (error) {
             alert(error.message)
@@ -796,7 +823,7 @@
         }
     }
 
-    async function connectWalletHunt() {
+    async function connectWalletHunt(gameName) {
 
         if (!window.ethereum) { alert("No Wallet Detected") }
         else if (window.ethereum.networkVersion != huntingNetworkVersion) {
@@ -830,7 +857,7 @@
             };
             document.getElementById("hunt-connect-2").style.cursor = "default";
 
-            insertHuntingNFTWallet()
+            insertHuntingNFTWallet(gameName)
         }
     }
 
