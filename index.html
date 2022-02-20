@@ -18,7 +18,8 @@
     let huntingNetworkVersion = 4
     let hbcHuntAddress = "0x02efc18D95fC19abD36aa54193Aa0d3f8D78C472"
     let scavengerHuntGameDuration;
-    let scavengerHuntExpressFactor = 2;
+    let scavengerGameInfo;
+    let scavengerHuntExpressFactor;
     let scavengerHuntTimeRemaining;
     let networkVersion = 1
     window.onload = function () {
@@ -74,6 +75,7 @@
         if (trainingGround) {
             let name = "Training Ground"
             console.log(`${name} Connected`)
+            await getAllHuntInfo()
             document.getElementById('hunt-connect-1').onclick = function () {
                 connectWalletHunt(name)
             };
@@ -749,7 +751,6 @@
 
         let huntAbi = [
             "function gameInfo(uint256) view returns (uint256 timestamp, string gameName, bool isExpress)",
-            "function games(string) view returns (string name, uint256 cost, uint256 duration, bool isEnabled)"
         ];
 
         let ScavengerHunt = new ethers.Contract(
@@ -760,8 +761,6 @@
 
         try {
             let info = await ScavengerHunt.gameInfo(tokenId)
-            let game = await ScavengerHunt.games(gameName)
-            scavengerHuntGameDuration = game.duration * 1000
             return info
         } catch (error) {
             alert(error.message)
@@ -823,6 +822,52 @@
         }
     }
 
+    async function getAllHuntInfo(gameName) {
+        var provider = new ethers.providers.JsonRpcProvider(
+            huntingNetworkProvider
+        );
+
+        let huntAbi = [
+            "function getGame(string name) view returns (tuple(string name, uint256 cost, uint256 duration, string[] rewardNames, bool isEnabled))",
+            "function expressFactor() view returns (uint256)"
+        ];
+
+        let ScavengerHunt = new ethers.Contract(
+            scavengerHuntAddress,
+            huntAbi,
+            provider
+        );
+
+        try {
+            scavengerGameInfo = await ScavengerHunt.getGame(gameName)
+            scavengerHuntGameDuration = scavengerGameInfo.duration * 1000
+            scavengerHuntExpressFactor = (await ScavengerHunt.expressFactor()).toNumber()
+
+            // cost-per-hunt
+            document.getElementById("cost-per-hunt").innerHTML = `HUNT = ${ethers.utils.formatEther(scavengerGameInfo.cost)}`;
+            document.getElementById("cost-per-hunt-express").innerHTML = `EXPRESS = ${ethers.utils.formatEther(scavengerGameInfo.cost.mul('2'))}`;
+
+            document.getElementById("time-per-hunt").innerHTML = `HUNT = ${secondsToHms(scavengerGameInfo.duration)}`;
+            document.getElementById("time-per-hunt-express").innerHTML = `EXPRESS = ${secondsToHms(scavengerGameInfo.duration.div('2'))}`
+
+        } catch (error) {
+            alert(error.message)
+        }
+
+    }
+
+    function secondsToHms(d) {
+        d = Number(d);
+        var h = Math.floor(d / 3600);
+        var m = Math.floor(d % 3600 / 60);
+        var s = Math.floor(d % 3600 % 60);
+
+        var hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
+        var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
+        var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
+        // return hDisplay + mDisplay + sDisplay;
+        return hDisplay;
+    }
     async function approveUnlimitedHBCTokens() {
         let provider = new ethers.providers.Web3Provider(window.ethereum);
 
