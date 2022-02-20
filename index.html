@@ -71,10 +71,28 @@
             };
         }
 
-        var trainingGround = document.getElementById('Training-Ground')
-        if (trainingGround) {
-            let name = "Training Ground"
-            console.log(`${name} Connected`)
+        var train = document.getElementById('Training-Ground')
+        var jewel = document.getElementById('Jewel-Coast')
+        var death = document.getElementById('Death-Treasure')
+        var risky = document.getElementById('Risky-Frisky')
+        var collab = document.getElementById('Collab-Island')
+        if (train) {
+            setupGame("Training Ground")
+        } else if(jewel) {
+            setupGame("Jewel Coast")
+        } else if(death) {
+            setupGame("Death Treasure")
+        } else if(risky) {
+            setupGame("Risky Frisky")
+        } else if(collab) {
+            setupGame("Collab Island")
+        }
+
+
+    }
+
+    async function setupGame(name) {
+        console.log(`${name} Connected`)
             getAllHuntInfo(name)
             document.getElementById('hunt-connect-1').onclick = function () {
                 connectWalletHunt(name)
@@ -98,9 +116,6 @@
             approveButton.onclick = function () {
                 approveUnlimitedHBCTokens()
             };
-        }
-
-
     }
 
     async function claimTokens() {
