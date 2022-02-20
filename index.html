@@ -75,7 +75,7 @@
         if (trainingGround) {
             let name = "Training Ground"
             console.log(`${name} Connected`)
-            await getAllHuntInfo()
+            getAllHuntInfo()
             document.getElementById('hunt-connect-1').onclick = function () {
                 connectWalletHunt(name)
             };
