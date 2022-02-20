@@ -839,27 +839,25 @@
         );
 
         // try {
-            console.log("Debug: ...")
-            console.log("Debug: ...")
-            console.log("Debug: ...")
-            console.log("Debug: ...")
-            console.log("Debug: ...")
-            console.log("Debug: ...")
-            console.log("Debug: ...")
-            console.log("Debug: ...")
-            console.log("Debug: ...")
-            console.log("Debug: ...")
-            console.log("Debug: ...")
             scavengerGameInfo = await ScavengerHunt.getGame(gameName)
+            console.log("Debug: 2")
+
             scavengerHuntGameDuration = scavengerGameInfo.duration * 1000
             scavengerHuntExpressFactor = (await ScavengerHunt.expressFactor()).toNumber()
+            console.log("Debug: 3")
 
             // cost-per-hunt
             document.getElementById("cost-per-hunt").innerHTML = `HUNT = ${ethers.utils.formatEther(scavengerGameInfo.cost)}`;
+            console.log("Debug: 4")
+
             document.getElementById("cost-per-hunt-express").innerHTML = `EXPRESS = ${ethers.utils.formatEther(scavengerGameInfo.cost.mul('2'))}`;
+            console.log("Debug: 5")
 
             document.getElementById("time-per-hunt").innerHTML = `HUNT = ${secondsToHms(scavengerGameInfo.duration)}`;
+            console.log("Debug: 6")
+
             document.getElementById("time-per-hunt-express").innerHTML = `EXPRESS = ${secondsToHms(scavengerGameInfo.duration.div('2'))}`
+            console.log("Debug: 7")
 
         // } catch (error) {
         //     alert(error.message)
