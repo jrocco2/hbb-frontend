@@ -828,7 +828,7 @@
         );
 
         let huntAbi = [
-            "function getGame(string name) view returns (tuple(string name, uint256 cost, uint256 duration, string[] rewardNames, bool isEnabled))",
+            "function getGame(string name) view returns tuple(string name, uint256 cost, uint256 duration, string[] rewardNames, bool isEnabled)",
             "function expressFactor() view returns (uint256)"
         ];
 
@@ -839,47 +839,8 @@
         );
 
         // try {
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 2")
-            console.log("Debug: 2")
-            console.log("Debug: 2")
-            console.log("Debug: 2")
-            console.log("Debug: 2")
-            console.log("Debug: 2")
-            console.log("Debug: 2")
-            console.log("Debug: 2")
-            console.log("Debug: 2")
-            console.log("Debug: 2")
-            console.log("Debug: 2")
-            console.log("Debug: 2")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
-            console.log("Debug: 1")
 
+            console.log("Getting game.....")
             scavengerGameInfo = await ScavengerHunt.getGame(gameName)
             console.log("Debug: 2")
 
