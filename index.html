@@ -846,9 +846,9 @@
 
             // cost-per-hunt
             document.getElementById("cost-per-hunt").innerHTML = `HUNT = ${parseInt(ethers.utils.formatEther(scavengerGameInfo.cost))} HBC`;
-            document.getElementById("cost-per-hunt-express").innerHTML = `EXPRESS = ${parseInt(ethers.utils.formatEther(scavengerGameInfo.cost.mul('2')))} HBC`;
+            document.getElementById("cost-per-hunt-express").innerHTML = `  EXPRESS = ${parseInt(ethers.utils.formatEther(scavengerGameInfo.cost.mul('2')))} HBC`;
             document.getElementById("time-per-hunt").innerHTML = `HUNT = ${secondsToHms(scavengerGameInfo.duration)}`;
-            document.getElementById("time-per-hunt-express").innerHTML = `EXPRESS = ${secondsToHms(scavengerGameInfo.duration.div('2'))}`
+            document.getElementById("time-per-hunt-express").innerHTML = `  EXPRESS = ${secondsToHms(scavengerGameInfo.duration.div('2'))}`
         } catch (error) {
             alert(error.message)
         }
