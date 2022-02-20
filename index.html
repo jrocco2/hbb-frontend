@@ -94,6 +94,8 @@
     async function setupGame(name) {
         console.log(`${name} Connected`)
             document.getElementById('hunt-timer').innerHTML = `CONNECT WALLET`
+            document.getElementById('hunt-timer').style.fontSize = "5vh"
+
             getAllHuntInfo(name)
             document.getElementById('hunt-connect-1').onclick = function () {
                 connectWalletHunt(name)
@@ -656,7 +658,7 @@
 
     async function insertHuntingNFTWallet(gameName) {
         document.getElementById('hunt-timer').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
-
+        document.getElementById('hunt-timer').style.fontSize = "10vh"
         var ethersProvider = new ethers.providers.JsonRpcProvider(
             huntingNetworkProvider
         );
@@ -723,6 +725,7 @@
             event.currentTarget.style.borderColor = "green"
 
             document.getElementById('hunt-timer').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
+            document.getElementById('hunt-timer').style.fontSize = "10vh"
             let gameInfo = getGameInfo(selectedNft, gameName).then((gameInfo) => {
 
                 if (gameInfo.timestamp.gt(0) && gameInfo.gameName == gameName) {
@@ -735,8 +738,10 @@
 
                     if (scavengerHuntTimeRemaining > 0) {
                         document.getElementById('hunt-timer').innerHTML = `${msToHMS(scavengerHuntTimeRemaining)}`
+                        document.getElementById('hunt-timer').style.fontSize = "10vh"
                     } else {
                         document.getElementById('hunt-timer').innerHTML = `00:00:00`
+                        document.getElementById('hunt-timer').style.fontSize = "10vh"
                     }
                     document.getElementById('end-hunt-button').style.display = "block"
                     document.getElementById('hunt-button-express').style.display = "none"
@@ -744,11 +749,13 @@
 
                 } else if (gameInfo.timestamp.gt(0) && gameInfo.gameName != gameName) {
                     document.getElementById('hunt-timer').innerHTML = `ON ANOTHER HUNT`
+                    document.getElementById('hunt-timer').style.fontSize = "5vh"
                     document.getElementById('hunt-button-express').style.display = "none"
                     document.getElementById('hunt-button').style.display = "none"
                     document.getElementById('end-hunt-button').style.display = "none"
                 } else {
                     document.getElementById('hunt-timer').innerHTML = `00:00:00`
+                    document.getElementById('hunt-timer').style.fontSize = "10vh"
                     document.getElementById('hunt-button-express').style.display = "block"
                     document.getElementById('hunt-button').style.display = "block"
                     document.getElementById('end-hunt-button').style.display = "none"
@@ -758,6 +765,7 @@
 
         }));
         document.getElementById('hunt-timer').innerHTML = `SELECT PLAYER (NFT)`
+        document.getElementById('hunt-timer').style.fontSize = "5vh"
     }
 
     function msToHMS(ms) {
@@ -810,7 +818,7 @@
         );
 
         document.getElementById('hunt-timer').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
-
+        document.getElementById('hunt-timer').style.fontSize = "10vh"
         try {
             let txn = await ScavengerHunt.endGame(name, selectedNft)
             const receipt = await txn.wait();
@@ -834,6 +842,7 @@
         );
 
         document.getElementById('hunt-timer').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
+        document.getElementById('hunt-timer').style.fontSize = "10vh"
         console.log(`Starting game called: ${name}, with tokenId: ${selectedNft}, express = ${isExpress}`)
         try {
             let txn = await ScavengerHunt.startGame(name, selectedNft, isExpress)
@@ -905,6 +914,7 @@
         );
 
         document.getElementById('hunt-timer').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
+        document.getElementById('hunt-timer').style.fontSize = "10vh"
         let txn = await HBC.approve(scavengerHuntAddress, ethers.constants.MaxUint256)
         const receipt = await txn.wait();
         window.location.reload();
