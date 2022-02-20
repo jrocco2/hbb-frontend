@@ -749,7 +749,7 @@
                     document.getElementById('hunt-button').style.display = "none"
 
                 } else if (gameInfo.timestamp.gt(0) && gameInfo.gameName != gameName) {
-                    document.getElementById('hunt-timer').innerHTML = `HUNTING ON ${gameName.toUpperCase()}`
+                    document.getElementById('hunt-timer').innerHTML = `HUNTING ON ${gameInfo.gameName.toUpperCase()}`
                     document.getElementById('hunt-timer').style.fontSize = "5vh"
                     document.getElementById('hunt-button-express').style.display = "none"
                     document.getElementById('hunt-button').style.display = "none"
