@@ -824,7 +824,13 @@
             let txn = await ScavengerHunt.endGame(name, selectedNft)
             const receipt = await txn.wait();
             // window.location.reload();
-            let events = receipt.events?.filter((x) => { return x.event == "GameEndedReward" })
+
+            let events;
+            for (const event of receipt.events) {
+                if (event.topics[0] == "0xe18bff3191cd9b861b58a65e15cb14254c3235813e91d333b2f726fc8a760c26") {
+                    events = [event]
+                }
+            }
             let eRewardType = parseInt(events[0].topics[1])
             let eAmount = ethers.utils.formatEther(events[0].topics[2])
             let eTokenId = parseInt(events[0].topics[3])
@@ -839,24 +845,24 @@
                 document.getElementById('popup-subheading').innerText = `YOU HAVE WON`
                 document.getElementById('popup-text').innerText = `${eAmount} HBC`
                 document.getElementById('popup-caption').innerText = `You can validate your rewards onchain here: ${etherscanUrl}${receipt.transactionHash}`
-            } else if  (eRewardType == 1) { // ETH
+            } else if (eRewardType == 1) { // ETH
                 document.getElementById('hunt-button').style.display = "flex"
                 document.getElementById('popup-heading').innerText = `CONGRATULATIONS`
                 document.getElementById('popup-subheading').innerText = `YOU HAVE WON`
                 document.getElementById('popup-text').innerText = `${eAmount} ETH`
                 document.getElementById('popup-caption').innerText = `You can validate your rewards onchain here: ${etherscanUrl}${receipt.transactionHash}`
-            } else if  (eRewardType == 2) { // IOU
+            } else if (eRewardType == 2) { // IOU
                 document.getElementById('hunt-button').style.display = "flex"
                 document.getElementById('popup-heading').innerText = `CONGRATULATIONS`
                 document.getElementById('popup-subheading').innerText = `YOU HAVE WON`
                 let iouName;
-                if(eTokenId == 1) { iouName = "Adidas NFT"}
-                else if(eTokenId == 2) { iouName = "Squishy Squad NFT" }
-                else if(eTokenId == 3) { iouName = "Nice Fun Zombie NFT" }
-                else if(eTokenId == 4) { iouName = "Whitelist NFT" }
+                if (eTokenId == 1) { iouName = "Adidas NFT" }
+                else if (eTokenId == 2) { iouName = "Squishy Squad NFT" }
+                else if (eTokenId == 3) { iouName = "Nice Fun Zombie NFT" }
+                else if (eTokenId == 4) { iouName = "Whitelist NFT" }
                 document.getElementById('popup-text').innerText = `${eAmount}x ${iouName}`
                 document.getElementById('popup-caption').innerText = `You can validate your rewards onchain here: ${etherscanUrl}${receipt.transactionHash}`
-            } else if  (eRewardType == 3) { // NOTHING
+            } else if (eRewardType == 3) { // NOTHING
                 document.getElementById('hunt-button').style.display = "flex"
                 document.getElementById('popup-heading').innerText = `OH NO :(`
                 document.getElementById('popup-subheading').innerText = `YOU DIDNT WIN`
