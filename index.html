@@ -840,19 +840,19 @@
             };
 
             if (eRewardType == 0) { //  HBC Token
-                document.getElementById('hunt-button').style.display = "flex"
+                document.getElementById('hunt-popup').style.display = "flex"
                 document.getElementById('popup-heading').innerText = `CONGRATULATIONS`
                 document.getElementById('popup-subheading').innerText = `YOU HAVE WON`
                 document.getElementById('popup-text').innerText = `${eAmount} HBC`
                 document.getElementById('popup-caption').innerText = `You can validate your rewards onchain here: ${etherscanUrl}${receipt.transactionHash}`
             } else if (eRewardType == 1) { // ETH
-                document.getElementById('hunt-button').style.display = "flex"
+                document.getElementById('hunt-popup').style.display = "flex"
                 document.getElementById('popup-heading').innerText = `CONGRATULATIONS`
                 document.getElementById('popup-subheading').innerText = `YOU HAVE WON`
                 document.getElementById('popup-text').innerText = `${eAmount} ETH`
                 document.getElementById('popup-caption').innerText = `You can validate your rewards onchain here: ${etherscanUrl}${receipt.transactionHash}`
             } else if (eRewardType == 2) { // IOU
-                document.getElementById('hunt-button').style.display = "flex"
+                document.getElementById('hunt-popup').style.display = "flex"
                 document.getElementById('popup-heading').innerText = `CONGRATULATIONS`
                 document.getElementById('popup-subheading').innerText = `YOU HAVE WON`
                 let iouName;
@@ -863,7 +863,7 @@
                 document.getElementById('popup-text').innerText = `${eAmount}x ${iouName}`
                 document.getElementById('popup-caption').innerText = `You can validate your rewards onchain here: ${etherscanUrl}${receipt.transactionHash}`
             } else if (eRewardType == 3) { // NOTHING
-                document.getElementById('hunt-button').style.display = "flex"
+                document.getElementById('hunt-popup').style.display = "flex"
                 document.getElementById('popup-heading').innerText = `OH NO :(`
                 document.getElementById('popup-subheading').innerText = `YOU DIDNT WIN`
                 document.getElementById('popup-text').innerText = `BETTER LUCK NEXT TIME`
