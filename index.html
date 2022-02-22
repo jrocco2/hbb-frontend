@@ -17,6 +17,7 @@
     let scavengerHuntAddress = "0x110B505F0A5a3E7C2442a266FD74BF89588fCf1D" // ScavengerHunt
     let huntingNetworkVersion = 4
     let hbcHuntAddress = "0x02efc18D95fC19abD36aa54193Aa0d3f8D78C472" // HBC
+    let etherscanUrl = "https://ropsten.etherscan.io/tx/"
     let scavengerHuntGameDuration;
     let scavengerGameInfo;
     let scavengerHuntExpressFactor;
@@ -78,13 +79,13 @@
         var collab = document.getElementById('Collab-Island')
         if (train) {
             setupGame("Training Ground")
-        } else if(jewel) {
+        } else if (jewel) {
             setupGame("Jewel Coast")
-        } else if(death) {
+        } else if (death) {
             setupGame("Death Treasure")
-        } else if(risky) {
+        } else if (risky) {
             setupGame("Risky Frisky")
-        } else if(collab) {
+        } else if (collab) {
             setupGame("Collab Island")
         }
 
@@ -93,32 +94,32 @@
 
     async function setupGame(name) {
         console.log(`${name} Connected for ${scavengerHuntAddress}`)
-            document.getElementById('hunt-timer').innerHTML = `CONNECT WALLET`
-            document.getElementById('hunt-timer').style.fontSize = "5vh"
+        document.getElementById('hunt-timer').innerHTML = `CONNECT WALLET`
+        document.getElementById('hunt-timer').style.fontSize = "5vh"
 
-            getAllHuntInfo(name)
-            document.getElementById('hunt-connect-1').onclick = function () {
-                connectWalletHunt(name)
-            };
-            document.getElementById('hunt-connect-2').onclick = function () {
-                connectWalletHunt(name)
-            };
+        getAllHuntInfo(name)
+        document.getElementById('hunt-connect-1').onclick = function () {
+            connectWalletHunt(name)
+        };
+        document.getElementById('hunt-connect-2').onclick = function () {
+            connectWalletHunt(name)
+        };
 
-            console.log("Finished Connecting")
-            document.getElementById('hunt-button').onclick = function () {
-                hunt(name, false)
-            };
-            document.getElementById('hunt-button-express').onclick = function () {
-                hunt(name, true)
-            };
+        console.log("Finished Connecting")
+        document.getElementById('hunt-button').onclick = function () {
+            hunt(name, false)
+        };
+        document.getElementById('hunt-button-express').onclick = function () {
+            hunt(name, true)
+        };
 
-            document.getElementById('end-hunt-button').onclick = function () {
-                endHunt(name)
-            };
-            let approveButton = document.getElementById('approve-hunt-button')
-            approveButton.onclick = function () {
-                approveUnlimitedHBCTokens()
-            };
+        document.getElementById('end-hunt-button').onclick = function () {
+            endHunt(name)
+        };
+        let approveButton = document.getElementById('approve-hunt-button')
+        approveButton.onclick = function () {
+            approveUnlimitedHBCTokens()
+        };
     }
 
     async function claimTokens() {
@@ -822,7 +823,48 @@
         try {
             let txn = await ScavengerHunt.endGame(name, selectedNft)
             const receipt = await txn.wait();
-            window.location.reload();
+            // window.location.reload();
+            let events = receipt.events?.filter((x) => { return x.event == "GameEndedReward" })
+            let eRewardType = parseInt(events[0].topics[1])
+            let eAmount = ethers.utils.formatEther(events[0].topics[2])
+            let eTokenId = parseInt(events[0].topics[3])
+
+            document.getElementById('continue-popup').onclick = function () {
+                window.location.reload();
+            };
+
+            if (eRewardType == 0) { //  HBC Token
+                document.getElementById('hunt-button').style.display = "flex"
+                document.getElementById('popup-heading').innerText = `CONGRATULATIONS`
+                document.getElementById('popup-subheading').innerText = `YOU HAVE WON`
+                document.getElementById('popup-text').innerText = `${eAmount} HBC`
+                document.getElementById('popup-caption').innerText = `You can validate your rewards onchain here: ${etherscanUrl}${receipt.transactionHash}`
+            } else if  (eRewardType == 1) { // ETH
+                document.getElementById('hunt-button').style.display = "flex"
+                document.getElementById('popup-heading').innerText = `CONGRATULATIONS`
+                document.getElementById('popup-subheading').innerText = `YOU HAVE WON`
+                document.getElementById('popup-text').innerText = `${eAmount} ETH`
+                document.getElementById('popup-caption').innerText = `You can validate your rewards onchain here: ${etherscanUrl}${receipt.transactionHash}`
+            } else if  (eRewardType == 2) { // IOU
+                document.getElementById('hunt-button').style.display = "flex"
+                document.getElementById('popup-heading').innerText = `CONGRATULATIONS`
+                document.getElementById('popup-subheading').innerText = `YOU HAVE WON`
+                let iouName;
+                if(eTokenId == 1) { iouName = "Adidas NFT"}
+                else if(eTokenId == 2) { iouName = "Squishy Squad NFT" }
+                else if(eTokenId == 3) { iouName = "Nice Fun Zombie NFT" }
+                else if(eTokenId == 4) { iouName = "Whitelist NFT" }
+                document.getElementById('popup-text').innerText = `${eAmount}x ${iouName}`
+                document.getElementById('popup-caption').innerText = `You can validate your rewards onchain here: ${etherscanUrl}${receipt.transactionHash}`
+            } else if  (eRewardType == 3) { // NOTHING
+                document.getElementById('hunt-button').style.display = "flex"
+                document.getElementById('popup-heading').innerText = `OH NO :(`
+                document.getElementById('popup-subheading').innerText = `YOU DIDNT WIN`
+                document.getElementById('popup-text').innerText = `BETTER LUCK NEXT TIME`
+                document.getElementById('popup-caption').innerText = `You can validate your rewards onchain here: ${etherscanUrl}${receipt.transactionHash}`
+            }
+
+
         } catch (error) {
             alert(error.message)
             window.location.reload();
@@ -920,11 +962,12 @@
         window.location.reload();
     }
 
-    async function checkApproveLimit() {
+    async function checkApproveLimitAndGetHBC() {
         let provider = new ethers.providers.Web3Provider(window.ethereum);
 
         let hbcAbi = [
             "function allowance(address owner, address spender) view returns (uint256)",
+            "function balanceOf(address account) external view returns (uint256)"
         ];
 
         let HBC = new ethers.Contract(
@@ -943,6 +986,10 @@
             document.getElementById('hunt-button-express').style.display = "none"
             document.getElementById('approve-hunt-button').style.display = "block"
         }
+
+        let balance = await HBC.balanceOf(addr)
+        document.getElementById('hbc-amount').innerText = `${ethers.utils.formatEther(balance)}`
+
     }
 
     async function connectWalletHunt(gameName) {
@@ -980,7 +1027,7 @@
             document.getElementById("hunt-connect-2").style.cursor = "default";
 
             insertHuntingNFTWallet(gameName)
-            checkApproveLimit()
+            checkApproveLimitAndGetHBC()
 
         }
     }
