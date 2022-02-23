@@ -863,7 +863,7 @@
                 else if (eTokenId == 2) { iouName = "Squishy Squad NFT" }
                 else if (eTokenId == 3) { iouName = "Nice Fun Zombie NFT" }
                 else if (eTokenId == 4) { iouName = "Whitelist NFT" }
-                document.getElementById('popup-text').innerText = `${eAmount}x ${iouName}`
+                document.getElementById('popup-text').innerText = `${parseInt(eAmount)}x ${iouName}`
                 document.getElementById('popup-caption').innerText = `You can validate your rewards onchain here: ${etherscanUrl}${receipt.transactionHash}`
             } else if (eRewardType == 3) { // NOTHING
                 document.getElementById('hunt-popup').style.display = "flex"
