@@ -10,14 +10,14 @@
     let stakingContractAddress = window.location.pathname == '/stake-new' ? "0x361372320A5fbAADF41c9F0829C66819a1510836" : "0xaf2e1e2fB8AAB3cB951ADcBC3dc448Af52603f7A"
     let tokenContractAddress = "0x2D163701bF3920fF1b1AD0e3B1d0e0d5747CF067"
     let networkProvider = "https://eth-mainnet.alchemyapi.io/v2/Wq9Q8vRbE6Spk184NPdedK15LyhgRa4N"
-    let huntingNetworkProvider = "https://rinkeby.infura.io/v3/1e47f37441a6422b97e87f46397688c4"
+    let huntingNetworkProvider = "https://eth-mainnet.alchemyapi.io/v2/Wq9Q8vRbE6Spk184NPdedK15LyhgRa4N"
     // console.log(huntingNetworkProvider)
     // let huntingNetworkProvider = "https://eth-rinkeby.alchemyapi.io/v2/df-3YgaL0V-V0leLzSxIw-ifNK1wUbq4"
-    let huntingNftContractAddress = "0x1cf8e3a0894b93E3849E7A4c1F6912fb2E7bD31A" // HBB
-    let scavengerHuntAddress = "0x1d2e8289D9009b5a04C650DC1475c40D0527eB17" // ScavengerHunt
-    let huntingNetworkVersion = 4
-    let hbcHuntAddress = "0x02efc18D95fC19abD36aa54193Aa0d3f8D78C472" // HBC
-    let etherscanUrl = "https://rinkeby.etherscan.io/tx/"
+    let huntingNftContractAddress = "0x630f9ff82F82A68671dF290fFAEC2D767Df77a07" // HBB
+    let scavengerHuntAddress = "0xD42C6826C7F5284777726a75EbaFf10Bb4Ea0A67" // ScavengerHunt
+    let huntingNetworkVersion = 1
+    let hbcHuntAddress = "0x2D163701bF3920fF1b1AD0e3B1d0e0d5747CF067" // HBC
+    let etherscanUrl = "https://etherscan.io/tx/"
     let scavengerHuntGameDuration;
     let scavengerGameInfo;
     let scavengerHuntExpressFactor;
@@ -25,18 +25,6 @@
     let networkVersion = 1
     window.onload = function () {
 
-        console.log("BUMP")
-        console.log("BUMP")
-        console.log("BUMP")
-        console.log("BUMP")
-        console.log("BUMP")
-        console.log("BUMP")
-        console.log("BUMP")
-        console.log("BUMP")
-        console.log("BUMP")
-        console.log("BUMP")
-        console.log("BUMP")
-        console.log("BUMP")
         var mintButton = document.getElementById('mint-button')
         if (mintButton) {
             updateNftStats();
