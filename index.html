@@ -821,7 +821,10 @@
         document.getElementById('hunt-timer').innerHTML = `<i class="fa fa-spinner fa-spin"></i>`
         document.getElementById('hunt-timer').style.fontSize = "10vh"
         try {
-            let txn = await ScavengerHunt.endGame(name, selectedNft)
+            const gasUsed = await ScavengerHunt.estimateGas.endGame(name, selectedNft)
+            console.log("Gas needed: ", gasUsed)
+            console.log("Gas supplied: ", gasUsed.mul("2"))
+            let txn = await ScavengerHunt.endGame(name, selectedNft, {gasLimit: gasUsed.mul("2")})
             const receipt = await txn.wait();
             // window.location.reload();
 
